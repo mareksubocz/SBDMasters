@@ -16,15 +16,19 @@ app.action = Action(services.shared_memory)
 import importlib
 
 
-def register(path):
+def register(path, num_count=1):
     contrib = importlib.import_module(path)
-    services.register(contrib.__worker__)
+    for _ in range(num_count):
+        # FIXME: tutaj allocuj a nie w pliku! (instacja)
+        services.register(contrib.__worker__)
     contrib.__hook__.action = app.action
     app.blueprint(contrib.__hook__)
 
 
+# FIXME: metoda sanitizyacji wiadomosci w kolejce i hashmapie?????
+
 # FIXME: read from configuration file
-register("contrib.user")
+register("contrib.user", num_count=3)
 register("contrib.worker_b")
 
 
@@ -32,10 +36,15 @@ register("contrib.worker_b")
 @app.route("/pull")
 async def pull(request):
     # FIXME: wiele naraz zwraca? teraz tylko [0]
+    # FIXME: mozliwosc robienia tu post hook-a????? dla modulow
+    #        naprzyklad dla nadania auth_token
     token = int(request.args["token"][0])
     print(f"\033[92m------->\033[m {token}")
     data = app.action.get(token)
-    return json({"result": data})
+    response = json({"result": data})
+    if isinstance(data, dict) and "auth_token" in data:
+        response.cookies["auth_token"] = data["auth_token"]
+    return response
 
 
 if __name__ == "__main__":

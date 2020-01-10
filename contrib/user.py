@@ -30,7 +30,7 @@ async def hook_user_create(request):
     # trzeba tu oczyscic to wszystko i wyslac tylko to co potrzebne
     # no i zabezpiecznie
 
-    print(request.json)
+    print(request.json)  # username + password
 
     __hook__.action.push(name="user.create", token=token, data=request.json)
     return json({"result": "accepted", "token": token})
@@ -70,6 +70,63 @@ def user_create(worker, task: Task):
         worker.action.set(token=task.token, data="Error while creating user")
 
     worker.action.set(token=task.token, data="User created")
+
+
+# --- TOKEN ---
+
+
+@__hook__.route("/user/token", methods=["POST"])
+async def hook_user_token(request):
+    token = __hook__.action.random_token()
+
+    print(request.json)  # username + password
+
+    __hook__.action.push(name="user.token", token=token, data=request.json)
+    return json({"result": "accepted", "token": token})
+
+
+@register(__worker__, "user.token")
+def user_token(worker, task: Task):
+    username = task.data["username"]
+    password = task.data["password"]
+
+    print(f"username={username}")
+    print(f"password={password}")
+
+    user = (worker.shared_memory["session"].query(User).filter(
+        User.username == username).first())
+
+    if not user or not user.verify_password(password):
+        worker.action.set(token=task.token, data="Wrong password")
+        return
+
+    auth_token = user.generate_auth_token().decode("ascii")
+    worker.action.set(token=task.token, data={"auth_token": auth_token})
+
+
+# --- CHECK ---
+
+# FIXME: porzadki!!!! USER MODEL HALO przeniesc z tad!
+
+
+# FIXME: define as decorator
+# FIXME: dla danego uzytkownika?
+def auth_verify(request):
+    # FIXME: cookie albo mamy request? z parametrem auth_token?
+    auth_token = request.cookies.get("auth_token")
+    user = User.verify_auth_token(auth_token)
+    if not user:
+        return False
+    return True
+
+
+@__hook__.route("/user/check")
+async def hook_user_check(request):
+    if not auth_verify(request):
+        return json({"result": "declined", "message": "Not logged in"})
+    print(request.json)  # username + password
+
+    return json({"result": "accepted"})
 
 
 # --- DELETE ---

@@ -27,7 +27,7 @@ def register(path):
 
 
 # FIXME: read from configuration file
-register("contrib.worker_a")
+register("contrib.user")
 register("contrib.worker_b")
 
 

@@ -25,4 +25,4 @@ class WorkerB(Worker):
 
 
 __blueprint__ = app
-__worker__ = WorkerB
+__worker__ = WorkerB()

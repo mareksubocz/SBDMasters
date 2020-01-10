@@ -8,13 +8,7 @@ from sanic.response import json
 
 # https://www.youtube.com/watch?v=yAv5pLO37mE
 
-# FIXME: blueprints
 # FIXME: prefix dla workera --> kolejka / user.create_user
-
-
-class WorkerA(Worker):
-    name = "A"
-    pass
 
 
 class WorkerB(Worker):
@@ -26,29 +20,34 @@ class WorkerB(Worker):
         self.action.set(token=task.token, data=str(task.data) + "+BBBB")
 
 
-app = Sanic()
+# FIXME: register function
+
+app = Sanic(name="dev")
 shared_memory_clean = SharedMemory()
 services = Services(shared_memory_clean)
+app.action = Action(services.shared_memory)
 
-services.register(WorkerA)
-services.register(WorkerA)
-services.register(WorkerB)
-
-action = Action(services.shared_memory)
+import importlib
 
 
-@app.route("/worker_a")
-async def worker_a(request):
-    token = action.random_token()
-    action.push(name="A", token=token, data="omg")
-    return json({"result": "accepted", "token": token})
+def register(path):
+    contrib = importlib.import_module(path)
+    services.register(contrib.__worker__)
+    contrib.__blueprint__.action = app.action
+    app.blueprint(contrib.__blueprint__)
+
+
+register("contrib.worker_a")
 
 
 @app.route("/worker_b")
 async def worker_b(request):
-    token = action.random_token()
-    action.push(name="B", token=token, data="omg")
+    token = app.action.random_token()
+    app.action.push(name="B", token=token, data="omg")
     return json({"result": "accepted", "token": token})
+
+
+services.register(WorkerB)
 
 
 @app.route("/pull")
@@ -56,7 +55,7 @@ async def pull(request):
     # FIXME: wiele naraz zwraca? teraz tylko [0]
     token = int(request.args["token"][0])
     print(f"\033[92m------->\033[m {token}")
-    data = action.get(token)
+    data = app.action.get(token)
     return json({"result": data})
 
 

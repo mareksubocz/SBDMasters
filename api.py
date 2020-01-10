@@ -1,6 +1,6 @@
-from core.service import Worker, Services
-from core.action import Task, Action
+from core.action import Action
 from core.shared import SharedMemory
+from core.service import Services
 
 from sanic import Sanic
 from sanic.log import logger
@@ -9,18 +9,7 @@ from sanic.response import json
 # https://www.youtube.com/watch?v=yAv5pLO37mE
 
 # FIXME: prefix dla workera --> kolejka / user.create_user
-
-
-class WorkerB(Worker):
-    name = "B"
-
-    def call(self, task: Task):
-        logger.info(f"[{self.name}:{self.idx}] HAVE -->\
-\t token={task.token} \t data={task.data}")
-        self.action.set(token=task.token, data=str(task.data) + "+BBBB")
-
-
-# FIXME: register function
+# FIXME: register function /?
 
 app = Sanic(name="dev")
 shared_memory_clean = SharedMemory()
@@ -37,17 +26,9 @@ def register(path):
     app.blueprint(contrib.__blueprint__)
 
 
+# FIXME: read from configuration file
 register("contrib.worker_a")
-
-
-@app.route("/worker_b")
-async def worker_b(request):
-    token = app.action.random_token()
-    app.action.push(name="B", token=token, data="omg")
-    return json({"result": "accepted", "token": token})
-
-
-services.register(WorkerB)
+register("contrib.worker_b")
 
 
 @app.route("/pull")

@@ -5,6 +5,7 @@ from dataclasses import dataclass
 
 @dataclass
 class Task:
+    name: str
     token: int
     data: object
 
@@ -19,8 +20,8 @@ class Action:
         return random.randint(0, sys.maxsize)
 
     def push(self, name=None, token=None, data=None):
-        obj = Task(token=token, data=data)
-        self.shared_memory["queue"].push(obj, name=name)
+        obj = Task(name=name, token=token, data=data)
+        self.shared_memory["queue"].push(obj, name=name.split(".")[0])
 
     def pull(self, name=None):
         return self.shared_memory["queue"].pull(name=name)

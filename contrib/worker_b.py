@@ -24,5 +24,5 @@ class WorkerB(Worker):
         self.action.set(token=task.token, data=str(task.data) + "+BBBB")
 
 
-__blueprint__ = app
-__worker__ = WorkerB
+__hook__ = app
+__worker__ = WorkerB()

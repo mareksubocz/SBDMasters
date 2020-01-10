@@ -8,9 +8,6 @@ from sanic.response import json
 
 # https://www.youtube.com/watch?v=yAv5pLO37mE
 
-# FIXME: prefix dla workera --> kolejka / user.create_user
-# FIXME: register function /?
-
 app = Sanic(name="dev")
 shared_memory_clean = SharedMemory()
 services = Services(shared_memory_clean)
@@ -22,8 +19,8 @@ import importlib
 def register(path):
     contrib = importlib.import_module(path)
     services.register(contrib.__worker__)
-    contrib.__blueprint__.action = app.action
-    app.blueprint(contrib.__blueprint__)
+    contrib.__hook__.action = app.action
+    app.blueprint(contrib.__hook__)
 
 
 # FIXME: read from configuration file
@@ -34,6 +31,7 @@ register("contrib.tag")
 register("contrib.group")
 
 
+# FIXME: move to core?
 @app.route("/pull")
 async def pull(request):
     # FIXME: wiele naraz zwraca? teraz tylko [0]

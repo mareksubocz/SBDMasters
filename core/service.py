@@ -1,5 +1,6 @@
 import sys
 import random
+import functools
 import multiprocessing
 
 from core.action import Task, Action
@@ -9,21 +10,24 @@ class Worker:
     idx = None
     shared_memory = None
     action = None
+    hooks = {}
 
     name = "__main__"
 
-    def __init__(self, shared_memory):
+    def __init__(self):
         self.idx = random.randint(0, sys.maxsize)
+
+    def connect(self, shared_memory):
         self.shared_memory = shared_memory
         self.action = Action(self.shared_memory)
-        self.run()
 
     @classmethod
     def prepare(cls, _shared_memory):
         _shared_memory["queue"].create(cls.name)
         return _shared_memory
 
-    def run(self):
+    def run(self, shared_memory):
+        self.connect(shared_memory)
         print(f"--- WORKER* --- (idx={self.name}:{self.idx})")
         while True:
             try:
@@ -33,9 +37,30 @@ class Worker:
                 break
 
     def call(self, task: Task):
-        print(f"[{self.name}:{self.idx}] HAVE -->\
-\t token={task.token} \t data={task.data}")
-        self.action.set(token=task.token, data=str(task.data) + "+done")
+        print(f"[\033[94m{self.name}\033[m:{str(self.idx)[0:4]}+] HAVE -->\
+\t name=\033[92m{task.name}\033[m \t token={task.token} \t data={task.data}")
+        try:
+            self.hooks[task.name](self, task)
+        except BaseException:
+            print(f"--> \033[91mFAILED\033[m: {task.name}")
+
+    def register(self, action_name, func):
+        self.hooks[action_name] = func
+
+
+def register(worker, action_name):
+    print(f"--- register={action_name} ---")
+
+    def decorator_register(func):
+        @functools.wraps(func)
+        def wrapper_register(*args, **kwargs):
+            value = func(*args, **kwargs)
+            return value
+
+        worker.register(action_name=action_name, func=wrapper_register)
+        return wrapper_register
+
+    return decorator_register
 
 
 class Services:
@@ -46,7 +71,8 @@ class Services:
         self.shared_memory = shared_memory
 
     def register(self, cls):
-        proc = multiprocessing.Process(target=cls, args=(self.shared_memory, ))
+        proc = multiprocessing.Process(target=cls.run,
+                                       args=(self.shared_memory, ))
         self.shared_memory = cls.prepare(self.shared_memory)
         self.processes.append(proc)
 

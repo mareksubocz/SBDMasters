@@ -56,7 +56,9 @@ class MemoryHashmap:
         self.memory[token] = data
 
     def get(self, token):
-        return self.memory[token]
+        if token in self.memory:
+            return self.memory[token]
+        return -1
 
 
 class Action:
@@ -72,16 +74,27 @@ class Action:
         obj = Task(token=token, data=data)
         self.shared_memory["queue"].push(obj, name=name)
 
+    def pull(self, name=None):
+        return self.shared_memory["queue"].pull(name=name)
+
+    def set(self, token=None, data=None):
+        self.shared_memory["hashmap"].set(token, data)
+
+    def get(self, token=None):
+        return self.shared_memory["hashmap"].get(token)
+
 
 class Worker:
     idx = None
     shared_memory = None
+    action = None
 
     name = "__main__"
 
     def __init__(self, shared_memory):
         self.idx = random.randint(0, sys.maxsize)
         self.shared_memory = shared_memory
+        self.action = Action(self.shared_memory)
         self.run()
 
     @classmethod
@@ -90,10 +103,10 @@ class Worker:
         return _shared_memory
 
     def run(self):
-        print(f"--- WORKER* --- (idx={self.idx})")
+        print(f"--- WORKER* --- (idx={self.name}:{self.idx})")
         while True:
             try:
-                self.call(self.shared_memory["queue"].pull(name=self.name))
+                self.call(self.action.pull(name=self.name))
             except BaseException:
                 # FIXME: worker padl!
                 break
@@ -101,6 +114,7 @@ class Worker:
     def call(self, task: Task):
         print(f"[{self.name}:{self.idx}] HAVE -->\
 \t token={task.token} \t data={task.data}")
+        self.action.set(token=task.token, data=str(task.data) + "+done")
 
 
 class WorkerA(Worker):
@@ -113,7 +127,7 @@ class WorkerB(Worker):
     pass
 
 
-class ProcessBag:
+class Services:
     processes = []
     shared_memory = None
 
@@ -136,27 +150,34 @@ class ProcessBag:
 
 shared_memory_clean = SharedMemory()
 
-bag = ProcessBag(shared_memory_clean)
+services = Services(shared_memory_clean)
 
-bag.register(WorkerA)
-bag.register(WorkerA)
+services.register(WorkerA)
+services.register(WorkerA)
 
-bag.register(WorkerB)
+services.register(WorkerB)
 
-action = Action(bag.shared_memory)
+action = Action(services.shared_memory)
 
+tokens = []
 for data in range(100):
-    action.push(name="A", token=action.random_token(), data=data)
+    token = action.random_token()
+    action.push(name="A", token=token, data=data)
+    tokens.append(token)
 
-bag.run()
+services.run()
 print("--- SERVICE ---")
 
 import time
 
 time.sleep(2)
-
+"""
 for data in range(100):
     action.push(name="A", token=action.random_token(), data=data)
     action.push(name="B", token=action.random_token(), data=data)
+"""
 
-bag.wait()
+for token in tokens:
+    print(action.get(token))
+
+services.wait()

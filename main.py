@@ -1,8 +1,15 @@
 import sys
 import random
 import multiprocessing
+from dataclasses import dataclass
 
 # ERROR: https://www.youtube.com/watch?v=4HX6nSlBGss
+
+
+@dataclass
+class Task:
+    token: int
+    data: object
 
 
 class SharedMemory:
@@ -52,6 +59,20 @@ class MemoryHashmap:
         return self.memory[token]
 
 
+class Action:
+    shared_memory = None
+
+    def __init__(self, shared_memory):
+        self.shared_memory = shared_memory
+
+    def random_token(self):
+        return random.randint(0, sys.maxsize)
+
+    def push(self, name=None, token=None, data=None):
+        obj = Task(token=token, data=data)
+        self.shared_memory["queue"].push(obj, name=name)
+
+
 class Worker:
     idx = None
     shared_memory = None
@@ -77,8 +98,9 @@ class Worker:
                 # FIXME: worker padl!
                 break
 
-    def call(self, task):
-        print(f"[{self.name}:{self.idx}] HAVE --> {task}")
+    def call(self, task: Task):
+        print(f"[{self.name}:{self.idx}] HAVE -->\
+\t token={task.token} \t data={task.data}")
 
 
 class WorkerA(Worker):
@@ -112,19 +134,29 @@ class ProcessBag:
             proc.join()
 
 
-shared_memory = SharedMemory()
+shared_memory_clean = SharedMemory()
 
-bag = ProcessBag(shared_memory)
+bag = ProcessBag(shared_memory_clean)
 
 bag.register(WorkerA)
 bag.register(WorkerA)
 
 bag.register(WorkerB)
 
-for i in range(100):
-    bag.shared_memory["queue"].push(i, name="A")
-    bag.shared_memory["queue"].push(i, name="B")
+action = Action(bag.shared_memory)
+
+for data in range(100):
+    action.push(name="A", token=action.random_token(), data=data)
 
 bag.run()
 print("--- SERVICE ---")
+
+import time
+
+time.sleep(2)
+
+for data in range(100):
+    action.push(name="A", token=action.random_token(), data=data)
+    action.push(name="B", token=action.random_token(), data=data)
+
 bag.wait()

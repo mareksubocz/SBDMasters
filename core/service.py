@@ -43,8 +43,6 @@ class Worker:
             self.hooks[task.name](self, task)
         except BaseException:
             print(f"--> \033[91mFAILED\033[m: {task.name}")
-        # self.action.set(token=task.token, data=str(task.data) + "+done")
-        # FIXME --> task.name --> choose from hooks? and run
 
     def register(self, action_name, func):
         self.hooks[action_name] = func

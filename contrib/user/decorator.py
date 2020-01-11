@@ -1,11 +1,13 @@
-from contrib.user.model import User
+from contrib.models import User
 
 
 # FIXME: define as decorator
 # FIXME: dla danego uzytkownika?
 def auth_verify(session, request, username=None):
-    auth_tokens = [request.cookies.get("auth_token")]
+    auth_tokens = []
 
+    if request.cookies.get("auth_token") is not None:
+        auth_tokens.append(request.cookies.get("auth_token"))
     if request.args is not None and "auth_token" in request.args:
         auth_tokens.append(request.args["auth_token"])
     if request.json is not None and "auth_token" in request.json:

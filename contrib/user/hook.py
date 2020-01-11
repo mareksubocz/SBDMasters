@@ -36,6 +36,19 @@ async def hook_user_token(request):
     return json({"result": "accepted", "token": token})
 
 
+# --- PROFILE ---
+
+
+@__hook__.route("/user/profile")
+async def hook_user_profile(request):
+    token = __hook__.action.random_token()
+
+    print(request.json)  # username
+
+    __hook__.action.push(name="user.profile", token=token, data=request.json)
+    return json({"result": "accepted", "token": token})
+
+
 # --- CHECK ---
 
 
@@ -46,13 +59,3 @@ async def hook_user_check(request):
     print(request.json)  # username + password
 
     return json({"result": "accepted"})
-
-
-# --- DELETE ---
-
-
-@__hook__.route("/user/delete")
-async def hook_user_delete(request):
-    token = __hook__.action.random_token()
-    __hook__.action.push(name="user.delete", token=token, data="lorem")
-    return json({"result": "accepted", "token": token})

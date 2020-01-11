@@ -1,7 +1,7 @@
 from core.action import Task
 from core.service import Worker, register
 
-from contrib.user.model import User
+from contrib.models import User
 
 
 # FIXME: jak potrzebna pamiec to odpowiednie inity w UserWorker?
@@ -69,9 +69,17 @@ def user_token(worker, task: Task):
     worker.action.set(token=task.token, data={"auth_token": auth_token})
 
 
-# --- DELETE ---
+# --- PROFILE ---
 
 
-@register(__worker__, "user.delete")
-def user_delete(worker, task: Task):
-    worker.action.set(token=task.token, data=str(task.data) + "+deleted")
+@register(__worker__, "user.profile")
+def user_profile(worker, task: Task):
+    username = task.data["username"]
+
+    print(f"username={username}")
+
+    user = (worker.shared_memory["session"].query(User).filter(
+        User.username == username).first())
+
+    print("----------------->", user.notes)
+    worker.action.set(token=task.token, data="lol")

@@ -1,14 +1,3 @@
-# FIXME: bash script
-# https://stackoverflow.com/questions/46781471/why-postgresql-on-mac-asks-me-for-password-after-fresh-install
-
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-
-SECRET_KEY = "omgomgomg"
-
-engine = create_engine("postgres://postgres:passsword@localhost:5432/")
-session = sessionmaker(bind=engine)()
-
 from sqlalchemy import Column, Integer, String, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
 from passlib.hash import pbkdf2_sha256
@@ -20,6 +9,9 @@ from itsdangerous import (
 )
 
 Base = declarative_base()
+
+# FIXME: LOAD FROM FILE!!!!!!!!
+SECRET_KEY = "omgomgomg"
 
 
 class User(Base):
@@ -41,7 +33,7 @@ class User(Base):
         return s.dumps({"id": self.id})
 
     @staticmethod
-    def verify_auth_token(token):
+    def verify_auth_token(session, token):
         s = Serializer(SECRET_KEY)
         try:
             data = s.loads(token)
@@ -51,8 +43,3 @@ class User(Base):
             return None  # invalid token
         user = session.query(User).filter(User.id == data["id"]).first()
         return user
-
-
-if __name__ == "__main__":
-    Base.metadata.drop_all(engine)
-    Base.metadata.create_all(engine)

@@ -1,14 +1,5 @@
 import multiprocessing
 
-# FIXME: THIS!!!!!!!!!!!!!!!
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-
-SECRET_KEY = "omgomgomg"
-
-engine = create_engine("postgres://postgres:passsword@localhost:5432/")
-# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
 
 class SharedMemory:
     manager = None
@@ -19,11 +10,22 @@ class SharedMemory:
         self.memory = {
             "queue": MemoryQueue(self.manager),
             "hashmap": MemoryHashmap(self.manager),
-            "session": sessionmaker(bind=engine)(),
+            "session": PostgreSQLDatabase(),
         }
 
     def __getitem__(self, key):
         return self.memory[key]
+
+
+def PostgreSQLDatabase(engine_only=False):
+    from sqlalchemy import create_engine
+    from sqlalchemy.orm import sessionmaker
+
+    config = "postgres://postgres:passsword@localhost:5432/"
+    engine = create_engine(config)
+    if engine_only:
+        return engine
+    return sessionmaker(bind=engine)()
 
 
 class MemoryQueue:

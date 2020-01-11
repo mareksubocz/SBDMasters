@@ -10,6 +10,19 @@ class Task:
     data: object
 
 
+"""
+@dataclass
+class Response:
+    # FIXME: pole task?
+    code: int
+    data: object
+
+
+# FIXME: create_response()? dla api?
+# z data? statusem? kodem?
+"""
+
+
 class Action:
     shared_memory = None
 

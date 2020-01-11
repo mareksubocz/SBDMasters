@@ -20,7 +20,7 @@ def register(path, num_count=1):
     contrib = importlib.import_module(path)
     for _ in range(num_count):
         # FIXME: tutaj allocuj a nie w pliku! (instacja)
-        services.register(contrib.__worker__)
+        services.register(contrib.__worker__())
     contrib.__hook__.action = app.action
     app.blueprint(contrib.__hook__)
 

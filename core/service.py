@@ -41,11 +41,12 @@ class Worker:
 \t name=\033[92m{task.name}\033[m \t token={task.token} \t data={task.data}")
         try:
             self.hooks[task.name](self, task)
-        except BaseException:
-            print(f"--> \033[91mFAILED\033[m: {task.name}")
+        except BaseException as e:
+            print(f"--> \033[91mFAILED\033[m: {task.name} `{str(e)}`")
 
-    def register(self, action_name, func):
-        self.hooks[action_name] = func
+    @classmethod
+    def register(cls, action_name, func):
+        cls.hooks[action_name] = func
 
 
 def register(worker, action_name):

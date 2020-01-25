@@ -50,7 +50,7 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-export default function NoteCard() {
+export default function NoteCard(props) {
     const classes = useStyles();
     const [expanded, setExpanded] = React.useState(false);
     const comments = []
@@ -68,24 +68,19 @@ export default function NoteCard() {
         <Card className={classes.card}>
             <CardHeader
                 avatar={
-                    <Avatar alt="Maciek" src={avatar} className={classes.avatar} />
+                    <Avatar alt={props.user} src={avatar} className={classes.avatar} />
                 }
                 action={
                     <IconButton aria-label="settings">
                         <MoreVertIcon />
                     </IconButton>
                 }
-                title="Maćko z Bogdańca, id: "
-                subheader="September 14, 2016"
+                title={props.user}
+                subheader={props.date}
             />
-            {/* <CardMedia
-        className={classes.media}
-        image={avatar}
-        title="Paella dish"
-      /> */}
             <CardContent>
                 <Typography variant="body2" color="textSecondary" component="p">
-                    Zobaczcie jaki fajny link <a href='www.example.com'>example</a>
+                    {props.content}
                 </Typography>
             </CardContent>
             <CardActions disableSpacing>

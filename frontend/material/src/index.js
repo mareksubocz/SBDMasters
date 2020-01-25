@@ -3,10 +3,11 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App';
 import LoginPage from './components/LoginPage'
+import RegisterPage from './components/RegisterPage'
 import Note from './components/Note'
 import Comment from './components/Comment'
 import Notfound from './components/NotFound'
-import { Route, Link, BrowserRouter as Router, Switch } from 'react-router-dom'
+import { Route, BrowserRouter as Router, Switch } from 'react-router-dom'
 import Timeline from './components/Timeline';
 import MenuList from './components/MenuList'
 
@@ -14,30 +15,11 @@ const routing = (
 
   < Router>
     <div>
-      {/* <ul>
-        <li>
-          <Link to="/">Home</Link>
-        </li>
-        <li>
-          <Link to="/login">Login</Link>
-        </li>
-        <li>
-          <Link to="/note">Note</Link>
-        </li>
-        <li>
-          <Link to="/comment">Comment</Link>
-        </li>
-        <li>
-          <Link to="/timeline">Timeline</Link>
-        </li>
-        <li>
-          <Link to="/menulist">Menu list</Link>;
-        </li>
-      </ul> */}
       <Switch>
         <Route exact path="/" component={App} />
         <Route path="/timeline" component={Timeline} />
         <Route path="/login" component={LoginPage} />
+        <Route path="/register" component={RegisterPage} />
         <Route path="/note/:id" component={Note} />
         <Route path="/comment" component={Comment} />
         <Route path="/menulist" component={MenuList} />

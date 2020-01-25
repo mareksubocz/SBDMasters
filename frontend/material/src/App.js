@@ -2,10 +2,13 @@ import React from "react";
 import Timeline from "./components/Timeline";
 import MenuList from "./components/MenuList";
 import GroupList from "./components/GroupList";
-import TopAppBar from "./components/TopAppBar"
+import TopAppBar from "./components/TopAppBar";
+import Cookies from 'universal-cookie';
 
 class App extends React.Component {
   render() {
+    const cookies = new Cookies();
+    console.log(cookies.get('token'));
     return (
       <div>
         <TopAppBar />

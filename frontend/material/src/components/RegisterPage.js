@@ -58,39 +58,33 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-export default function SignInSide() {
+export default function SignUp() {
   const classes = useStyles();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
 
   function validateForm() {
     return email.length > 0 && password.length > 0;
   }
 
-  function handleLogin(event) {
+  function handleRegister(event) {
     event.preventDefault();
-
     var xhr = new XMLHttpRequest()
-    var xhr2 = new XMLHttpRequest()
     const cookies = new Cookies();
 
     xhr.addEventListener('load', () => {
+      //   // update the state of the component with the result here
       console.log(xhr.responseText)
-      var response = JSON.parse(xhr.responseText)
-      xhr2.addEventListener('load', () => {
-        console.log(xhr2.responseText)
-        var response2 = JSON.parse(xhr2.responseText)
-        cookies.set('auth_token', response2.result.auth_token, { path: '/' });
-      })
-      for (var i = 0; i < 1000; i++) { console.log('mg') }
-      xhr2.open('POST', 'http://192.168.2.207:8000/pull')
-      xhr2.send(JSON.stringify({ token: [response.token] }))
+      cookies.set('token', xhr.responseText, { path: '/' });
     })
-
-    xhr.open('POST', 'http://192.168.2.207:8000/user/token')
-    xhr.send(JSON.stringify({ username: email, password: password }))
-    // window.location.replace("/");
+    // // open the request with the verb and the url
+    xhr.open('POST', "http://192.168.2.207:8000/user/create")
+    // xhr.setRequestHeader('Access-Control-Allow-Origin', '*')
+    // // send the request
+    xhr.send(JSON.stringify({ username: email, password: password, name: name }))
+    //// window.location.replace("/");
   }
 
   return (
@@ -103,9 +97,22 @@ export default function SignInSide() {
             <LockOutlinedIcon />
           </Avatar>
           <Typography component="h1" variant="h5">
-            Sign in
+            Sign up
           </Typography>
-          <form className={classes.form} onSubmit={handleLogin}>
+          <form className={classes.form} onSubmit={handleRegister}>
+            <TextField
+              variant="outlined"
+              margin="normal"
+              required
+              fullWidth
+              id="name"
+              label="Name and Surname"
+              name="name"
+              autoComplete="name"
+              autoFocus
+              value={name}
+              onChange={e => setName(e.target.value)}
+            />
             <TextField
               variant="outlined"
               margin="normal"
@@ -144,17 +151,17 @@ export default function SignInSide() {
               className={classes.submit}
               disabled={!validateForm()}
             >
-              Sign In
+              Sign Up
             </Button>
             <Grid container>
-              <Grid item xs>
+              {/* <Grid item xs>
                 <Link href="#" variant="body2">
                   Forgot password?
                 </Link>
-              </Grid>
+              </Grid> */}
               <Grid item>
-                <Link href="/register">
-                  Don't have an account? Sign Up
+                <Link href="/login">
+                  {"Already have an account? Sign in"}
                 </Link>
               </Grid>
             </Grid>

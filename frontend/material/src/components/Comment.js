@@ -31,35 +31,31 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-export default function CommentCard() {
+export default function CommentCard(props) {
   const classes = useStyles();
-  const [expanded, setExpanded] = React.useState(false);
+  // const [expanded, setExpanded] = React.useState(false);
 
-  const handleExpandClick = () => {
-    setExpanded(!expanded);
-  };
+  // const handleExpandClick = () => {
+  //   setExpanded(!expanded);
+  // };
 
   return (
     <Card className={classes.card}>
       <CardHeader className={classes.inside}
         avatar={
-          <Avatar alt="Wiesiek" src={avatar} className={classes.avatar} />
+          <Avatar alt={props.user} src={avatar} className={classes.avatar} />
         }
         action={
           <IconButton aria-label="add to favorites" className={classes.like}>
             <LikeIcon />
           </IconButton>
         }
-        title="Inny Wiesiek"
-        subheader="September 20, 2016"
+        title={props.user}
+        subheader={props.date}
       />
       <CardContent fullWidth className={classes.content}>
         <Typography variant="body2" color="textSecondary" component="p">
-          No, całkiem spoko. Może jednak coś coś?
-          Dsajsa
-          dsasd
-          das
-
+          {props.content}
         </Typography>
       </CardContent>
     </Card >

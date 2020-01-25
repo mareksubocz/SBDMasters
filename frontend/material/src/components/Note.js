@@ -20,10 +20,12 @@ import avatar from '../img/maciek.jpeg'
 import LikeIcon from '@material-ui/icons/ThumbUp'
 import { Button } from '@material-ui/core';
 import Comment from './Comment'
+import Divider from '@material-ui/core/Divider'
 
 const useStyles = makeStyles(theme => ({
     card: {
-        maxWidth: 345,
+        width: 450,
+        margin: 10,
     },
     media: {
         height: 0,
@@ -51,9 +53,15 @@ const useStyles = makeStyles(theme => ({
 export default function NoteCard() {
     const classes = useStyles();
     const [expanded, setExpanded] = React.useState(false);
+    const comments = []
 
     const handleExpandClick = () => {
         setExpanded(!expanded);
+    };
+
+    const addComment = () => {
+        comments.push(<Comment />);
+        comments.push(<Divider />);
     };
 
     return (

@@ -7,11 +7,14 @@ import Note from './components/Note'
 import Comment from './components/Comment'
 import Notfound from './components/NotFound'
 import { Route, Link, BrowserRouter as Router, Switch } from 'react-router-dom'
+import Timeline from './components/Timeline';
+import MenuList from './components/MenuList'
 
 const routing = (
-  <Router>
+
+  < Router>
     <div>
-      <ul>
+      {/* <ul>
         <li>
           <Link to="/">Home</Link>
         </li>
@@ -24,16 +27,24 @@ const routing = (
         <li>
           <Link to="/comment">Comment</Link>
         </li>
-      </ul>
+        <li>
+          <Link to="/timeline">Timeline</Link>
+        </li>
+        <li>
+          <Link to="/menulist">Menu list</Link>;
+        </li>
+      </ul> */}
       <Switch>
         <Route exact path="/" component={App} />
+        <Route path="/timeline" component={Timeline} />
         <Route path="/login" component={LoginPage} />
         <Route path="/note/:id" component={Note} />
         <Route path="/comment" component={Comment} />
+        <Route path="/menulist" component={MenuList} />
         <Route component={Notfound} />
       </Switch>
     </div>
-  </Router>
+  </Router >
 )
 
 ReactDOM.render(routing, document.getElementById('root'));

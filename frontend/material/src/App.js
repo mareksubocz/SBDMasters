@@ -7,12 +7,14 @@ import Cookies from 'universal-cookie';
 
 class App extends React.Component {
 
+  name = ""
+
   checkIfLoggedIn() {
     const cookies = new Cookies();
     var xhr = new XMLHttpRequest()
     xhr.addEventListener('load', () => {
       var response = JSON.parse(xhr.responseText)
-      if (response.result == "declined") {
+      if (response.result === "declined") {
         alert('Nie zalogowany')
         window.location.replace("/login");
       }
@@ -25,7 +27,7 @@ class App extends React.Component {
     this.checkIfLoggedIn()
     return (
       <div>
-        <TopAppBar />
+        <TopAppBar name={name} />
         <div style={{
           display: 'flex',           /* establish flex container */
           flexDirection: 'row',

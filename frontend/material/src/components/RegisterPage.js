@@ -32,7 +32,7 @@ function checkIfLoggedIn() {
   var xhr = new XMLHttpRequest()
   xhr.addEventListener('load', () => {
     var response = JSON.parse(xhr.responseText)
-    if (response.result != "declined")
+    if (response.result !== "declined")
       window.location.replace("/");
   })
   xhr.open('POST', 'http://192.168.2.207:8000/user/check')

@@ -57,7 +57,7 @@ function ButtonAppBar(props) {
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" color="inherit" className={classes.grow}>
-            SBD Masters
+            {props.name}
           </Typography>
           <Select
             value={age}

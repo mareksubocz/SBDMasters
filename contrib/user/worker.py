@@ -21,26 +21,38 @@ __worker__ = UserWorker
 def user_create(worker, task: Task):
     username = task.data["username"]
     password = task.data["password"]
+    name = task.data["name"]
 
     print(f"username={username}")
     print(f"password={password}")
+    print(f"name={name}")
 
-    if username is None or password is None:
-        worker.action.set(token=task.token,
-                          data="Couldn't create the user, missing params")
+    if username is None or password is None or name is None:
+        worker.action.set(
+            token=task.token, data="Couldn't create the user, missing params"
+        )
         return
-    if (worker.shared_memory["session"].query(User).filter_by(
-            username=username).first() is not None):
+    if (
+        worker.shared_memory["session"]
+        .query(User)
+        .filter_by(username=username)
+        .first()
+        is not None
+    ):
         worker.action.set(token=task.token, data="User already exist")
         return
 
-    user = User(username=username)
+    user = User(username=username, name=name)
     user.hash_password(password)
     worker.shared_memory["session"].add(user)
     worker.shared_memory["session"].commit()
 
-    reged_user = (worker.shared_memory["session"].query(User).filter(
-        User.username == username).first())
+    reged_user = (
+        worker.shared_memory["session"]
+        .query(User)
+        .filter(User.username == username)
+        .first()
+    )
     if not reged_user:
         worker.action.set(token=task.token, data="Error while creating user")
 
@@ -58,15 +70,21 @@ def user_token(worker, task: Task):
     print(f"username={username}")
     print(f"password={password}")
 
-    user = (worker.shared_memory["session"].query(User).filter(
-        User.username == username).first())
+    user = (
+        worker.shared_memory["session"]
+        .query(User)
+        .filter(User.username == username)
+        .first()
+    )
 
     if not user or not user.verify_password(password):
         worker.action.set(token=task.token, data="Wrong password")
+        print("WRONG PASSWORD")
         return
 
     auth_token = user.generate_auth_token().decode("ascii")
     worker.action.set(token=task.token, data={"auth_token": auth_token})
+    print("SENDING AUTH_TOKEN")
 
 
 # --- PROFILE ---
@@ -78,8 +96,12 @@ def user_profile(worker, task: Task):
 
     print(f"username={username}")
 
-    user = (worker.shared_memory["session"].query(User).filter(
-        User.username == username).first())
+    user = (
+        worker.shared_memory["session"]
+        .query(User)
+        .filter(User.username == username)
+        .first()
+    )
 
     print("----------------->", user.notes)
     worker.action.set(token=task.token, data="lol")

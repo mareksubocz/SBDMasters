@@ -36,15 +36,23 @@ register("contrib.group")
 
 
 # FIXME: move to core?
-@app.route("/pull")
+@app.route("/pull", methods=["GET", "POST"])
 async def pull(request):
     # FIXME: wiele naraz zwraca? teraz tylko [0]
     # FIXME: mozliwosc robienia tu post hook-a????? dla modulow
     #        naprzyklad dla nadania auth_token
-    token = int(request.args["token"][0])
+    # FIXME: -1 (odrzucony) -2 (przetwarzany) + gdy timeout
+    if "token" not in request.json:
+        print("\033[91mTOKEN EMPTY\033[m")
+        return json(
+            {"result": "declined"}, headers={"Access-Control-Allow-Origin": "*"}
+        )
+    token = int(request.json["token"][0])
     print(f"\033[92m------->\033[m {token}")
     data = app.action.get(token)
-    response = json({"result": data})
+    response = json(
+        {"result": data}, headers={"Access-Control-Allow-Origin": "*"}
+    )
     if isinstance(data, dict) and "auth_token" in data:
         response.cookies["auth_token"] = data["auth_token"]
     return response

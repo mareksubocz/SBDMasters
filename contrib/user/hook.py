@@ -20,7 +20,10 @@ async def hook_user_create(request):
     print(request.json)  # username + password
 
     __hook__.action.push(name="user.create", token=token, data=request.json)
-    return json({"result": "accepted", "token": token})
+    return json(
+        {"result": "accepted", "token": token},
+        headers={"Access-Control-Allow-Origin": "*"},
+    )
 
 
 # --- TOKEN ---
@@ -33,7 +36,10 @@ async def hook_user_token(request):
     print(request.json)  # username + password
 
     __hook__.action.push(name="user.token", token=token, data=request.json)
-    return json({"result": "accepted", "token": token})
+    return json(
+        {"result": "accepted", "token": token},
+        headers={"Access-Control-Allow-Origin": "*"},
+    )
 
 
 # --- PROFILE ---
@@ -46,16 +52,25 @@ async def hook_user_profile(request):
     print(request.json)  # username
 
     __hook__.action.push(name="user.profile", token=token, data=request.json)
-    return json({"result": "accepted", "token": token})
+    return json(
+        {"result": "accepted", "token": token},
+        headers={"Access-Control-Allow-Origin": "*"},
+    )
 
 
 # --- CHECK ---
 
 
-@__hook__.route("/user/check")
+@__hook__.route("/user/check", methods=["POST"])
 async def hook_user_check(request):
     if not auth_verify(__hook__.action.shared_memory["session"], request):
-        return json({"result": "declined", "message": "Not logged in"})
+        print("DECLINED")
+        return json(
+            {"result": "declined", "message": "Not logged in"},
+            headers={"Access-Control-Allow-Origin": "*"},
+        )
     print(request.json)  # username + password
-
-    return json({"result": "accepted"})
+    print("ACCEPTED")
+    return json(
+        {"result": "accepted"}, headers={"Access-Control-Allow-Origin": "*"}
+    )

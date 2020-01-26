@@ -27,6 +27,18 @@ function Copyright() {
   );
 }
 
+function checkIfLoggedIn() {
+  const cookies = new Cookies();
+  var xhr = new XMLHttpRequest()
+  xhr.addEventListener('load', () => {
+    var response = JSON.parse(xhr.responseText)
+    if (response.result != "declined")
+      window.location.replace("/");
+  })
+  xhr.open('POST', 'http://192.168.2.207:8000/user/check')
+  xhr.send(JSON.stringify({ auth_token: cookies.get('auth_token') }))
+}
+
 const useStyles = makeStyles(theme => ({
   root: {
     height: '100vh',
@@ -59,6 +71,9 @@ const useStyles = makeStyles(theme => ({
 }));
 
 export default function SignInSide() {
+
+  checkIfLoggedIn();
+
   const classes = useStyles();
 
   const [email, setEmail] = useState("");
@@ -81,8 +96,11 @@ export default function SignInSide() {
       xhr2.addEventListener('load', () => {
         console.log(xhr2.responseText)
         var response2 = JSON.parse(xhr2.responseText)
-        cookies.set('auth_token', response2.result.auth_token, { path: '/' });
+        cookies.set('auth_token', response2.result.auth_token);
+
+        window.location.replace("/");
       })
+      // TODO: Czekaj na coś innego niż -1 albo timeout po 2s
       for (var i = 0; i < 1000; i++) { console.log('mg') }
       xhr2.open('POST', 'http://192.168.2.207:8000/pull')
       xhr2.send(JSON.stringify({ token: [response.token] }))
@@ -90,7 +108,6 @@ export default function SignInSide() {
 
     xhr.open('POST', 'http://192.168.2.207:8000/user/token')
     xhr.send(JSON.stringify({ username: email, password: password }))
-    // window.location.replace("/");
   }
 
   return (

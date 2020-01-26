@@ -27,6 +27,18 @@ function Copyright() {
   );
 }
 
+function checkIfLoggedIn() {
+  const cookies = new Cookies();
+  var xhr = new XMLHttpRequest()
+  xhr.addEventListener('load', () => {
+    var response = JSON.parse(xhr.responseText)
+    if (response.result != "declined")
+      window.location.replace("/");
+  })
+  xhr.open('POST', 'http://192.168.2.207:8000/user/check')
+  xhr.send(JSON.stringify({ auth_token: cookies.get('auth_token') }))
+}
+
 const useStyles = makeStyles(theme => ({
   root: {
     height: '100vh',
@@ -59,6 +71,9 @@ const useStyles = makeStyles(theme => ({
 }));
 
 export default function SignUp() {
+
+  checkIfLoggedIn();
+
   const classes = useStyles();
 
   const [email, setEmail] = useState("");
@@ -71,20 +86,27 @@ export default function SignUp() {
 
   function handleRegister(event) {
     event.preventDefault();
+
     var xhr = new XMLHttpRequest()
+    var xhr2 = new XMLHttpRequest()
     const cookies = new Cookies();
 
     xhr.addEventListener('load', () => {
-      //   // update the state of the component with the result here
       console.log(xhr.responseText)
-      cookies.set('token', xhr.responseText, { path: '/' });
+      var response = JSON.parse(xhr.responseText)
+      xhr2.addEventListener('load', () => {
+        console.log(xhr2.responseText)
+        var response2 = JSON.parse(xhr2.responseText)
+        cookies.set('auth_token', response2.result.auth_token, { path: '/' });
+      })
+      for (var i = 0; i < 1000; i++) { console.log('mg') }
+      xhr2.open('POST', 'http://192.168.2.207:8000/pull')
+      xhr2.send(JSON.stringify({ token: [response.token] }))
     })
-    // // open the request with the verb and the url
-    xhr.open('POST', "http://192.168.2.207:8000/user/create")
-    // xhr.setRequestHeader('Access-Control-Allow-Origin', '*')
-    // // send the request
+
+    xhr.open('POST', 'http://192.168.2.207:8000/user/create')
     xhr.send(JSON.stringify({ username: email, password: password, name: name }))
-    //// window.location.replace("/");
+    window.location.replace("/");
   }
 
   return (

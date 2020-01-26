@@ -3,15 +3,15 @@ import Note from './Note'
 
 class Timeline extends React.Component {
   state = {
-    numNotes: 3
+    // numNotes: 3
   }
 
   render() {
     const notes = [];
 
-    for (var i = 0; i < this.state.numNotes; i += 1) {
-      notes.push(<Note />);
-    };
+    // for (var i = 0; i < this.state.numNotes; i += 1) {
+    // notes.push(<Note />);
+    // };
 
     return (
       <div style={{ direction: "vertical" }}>

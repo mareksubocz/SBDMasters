@@ -37,6 +37,7 @@ class User(Base):
     user_id = Column(Integer, primary_key=True)
     username = Column(String(32), index=True)
     password_hash = Column(String(128))
+    name = Column(String(64))
 
     notes = relationship("Note", back_populates="user")
     comments = relationship("Comment", back_populates="user")
@@ -61,8 +62,9 @@ class User(Base):
             return None  # valid token, but expired
         except BadSignature:
             return None  # invalid token
-        user = (session.query(User).filter(
-            User.user_id == data["user_id"]).first())
+        user = (
+            session.query(User).filter(User.user_id == data["user_id"]).first()
+        )
         return user
 
 
@@ -77,9 +79,9 @@ class Note(Base):
     user = relationship("User", back_populates="notes")
     comments = relationship("Comment")
     likes = relationship("Like")
-    tags = relationship("Tag",
-                        secondary=association_nt_table,
-                        back_populates="notes")
+    tags = relationship(
+        "Tag", secondary=association_nt_table, back_populates="notes"
+    )
 
 
 class Comment(Base):
@@ -114,9 +116,9 @@ class Tag(Base):
     tag_id = Column(Integer, primary_key=True)
     name = Column(String(512))
 
-    notes = relationship("Note",
-                         secondary=association_nt_table,
-                         back_populates="tags")
+    notes = relationship(
+        "Note", secondary=association_nt_table, back_populates="tags"
+    )
 
 
 class Group(Base):

@@ -25,12 +25,14 @@ class Response:
 
 class Action:
     shared_memory = None
+    maxsize = 6666666666
 
     def __init__(self, shared_memory):
         self.shared_memory = shared_memory
 
     def random_token(self):
-        return random.randint(0, sys.maxsize)
+        return random.randint(0, Action.maxsize)
+        # return random.randint(0, sys.maxsize)
 
     def push(self, name=None, token=None, data=None):
         obj = Task(name=name, token=token, data=data)

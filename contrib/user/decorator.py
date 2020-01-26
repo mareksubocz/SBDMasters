@@ -15,8 +15,11 @@ def auth_verify(session, request, username=None):
 
     for auth_token in auth_tokens:
         user = User.verify_auth_token(session, auth_token)
-        if (user and username is None) or (user.username == username
-                                           and username is not None):
+        if (user and username is None) or (
+            user is not None
+            and user.username == username
+            and username is not None
+        ):
             return True
 
     return False

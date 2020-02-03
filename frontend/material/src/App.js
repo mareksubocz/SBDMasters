@@ -7,8 +7,6 @@ import Cookies from 'universal-cookie';
 
 class App extends React.Component {
 
-  name = ""
-
   checkIfLoggedIn() {
     const cookies = new Cookies();
     var xhr = new XMLHttpRequest()
@@ -23,11 +21,15 @@ class App extends React.Component {
     xhr.send(JSON.stringify({ auth_token: cookies.get('auth_token') }))
   }
 
+  getName() {
+
+  }
+
   render() {
     this.checkIfLoggedIn()
     return (
       <div>
-        <TopAppBar name={name} />
+        <TopAppBar />
         <div style={{
           display: 'flex',           /* establish flex container */
           flexDirection: 'row',

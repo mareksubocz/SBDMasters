@@ -38,7 +38,9 @@ class App extends React.Component {
           alignContent: 'center',
         }}>
           <MenuList></MenuList>
-          <Timeline></Timeline>
+          <div>
+            <Timeline></Timeline>
+          </div>
           <GroupList></GroupList>
         </div >
       </div>

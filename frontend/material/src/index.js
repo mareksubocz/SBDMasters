@@ -10,6 +10,7 @@ import Notfound from './components/NotFound'
 import { Route, BrowserRouter as Router, Switch } from 'react-router-dom'
 import Timeline from './components/Timeline';
 import MenuList from './components/MenuList'
+import NewPostArea from './components/NewPostArea'
 
 const routing = (
 
@@ -23,6 +24,7 @@ const routing = (
         <Route path="/note/:id" component={Note} />
         <Route path="/comment" component={Comment} />
         <Route path="/menulist" component={MenuList} />
+        <Route path="/newpostarea" component={NewPostArea} />
         <Route component={Notfound} />
       </Switch>
     </div>

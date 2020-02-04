@@ -30,9 +30,9 @@ def register(path, num_count=1):
 # FIXME: read from configuration file
 register("contrib.user", num_count=3)
 register("contrib.worker_b")
-register("contrib.note")
-register("contrib.tag")
-register("contrib.group")
+# register("contrib.note")
+# register("contrib.tag")
+# register("contrib.group")
 
 
 # FIXME: move to core?
@@ -42,20 +42,25 @@ async def pull(request):
     # FIXME: mozliwosc robienia tu post hook-a????? dla modulow
     #        naprzyklad dla nadania auth_token
     # FIXME: -1 (odrzucony) -2 (przetwarzany) + gdy timeout
-    if "token" not in request.json:
-        print("\033[91mTOKEN EMPTY\033[m")
-        return json(
-            {"result": "declined"}, headers={"Access-Control-Allow-Origin": "*"}
+    try:
+        if "token" not in request.json:
+            print("\033[91mTOKEN EMPTY\033[m")
+            return json(
+                {"result": "declined"},
+                headers={"Access-Control-Allow-Origin": "*"},
+            )
+        token = int(request.json["token"][0])
+        print(f"\033[92m------->\033[m {token}")
+        data = app.action.get(token)
+        response = json(
+            {"result": data}, headers={"Access-Control-Allow-Origin": "*"}
         )
-    token = int(request.json["token"][0])
-    print(f"\033[92m------->\033[m {token}")
-    data = app.action.get(token)
-    response = json(
-        {"result": data}, headers={"Access-Control-Allow-Origin": "*"}
-    )
-    if isinstance(data, dict) and "auth_token" in data:
-        response.cookies["auth_token"] = data["auth_token"]
-    return response
+        if isinstance(data, dict) and "auth_token" in data:
+            response.cookies["auth_token"] = data["auth_token"]
+        return response
+    except BaseException as e:
+        print(e)
+        return json({}, headers={"Access-Control-Allow-Origin": "*"})
 
 
 if __name__ == "__main__":

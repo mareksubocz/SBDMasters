@@ -74,3 +74,17 @@ async def hook_user_check(request):
     return json(
         {"result": "accepted"}, headers={"Access-Control-Allow-Origin": "*"}
     )
+
+
+# --- DEBUG ---
+
+
+@__hook__.route("/user/debug", methods=["POST"])
+async def hook_user_debug(request):
+    token = __hook__.action.random_token()
+    print(request.json)
+    __hook__.action.push(name="user.debug", token=token, data=request.json)
+    return json(
+        {"result": "accepted", "token": token},
+        headers={"Access-Control-Allow-Origin": "*"},
+    )

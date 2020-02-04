@@ -1,30 +1,32 @@
 import React from 'react';
 import Note from './Note'
+import NewPostArena from './NewPostArea'
 
 class Timeline extends React.Component {
   state = {
-    // numNotes: 3
+    numNotes: 3
   }
 
   render() {
     const notes = [];
 
-    // for (var i = 0; i < this.state.numNotes; i += 1) {
-    // notes.push(<Note />);
-    // };
+    for (var i = 0; i < this.state.numNotes; i += 1) {
+      notes.push(<Note />);
+    };
 
     return (
       <div style={{ direction: "vertical" }}>
+        <NewPostArena></NewPostArena>
         {notes}
       </div>
     );
   }
 
-  // onAddChild = () => {
-  //   this.setState({
-  //     numNotes: this.state.numChildren + 1
-  //   });
-  // }
+  onAddChild = () => {
+    this.setState({
+      numNotes: this.state.numChildren + 1
+    });
+  }
 }
 
 export default Timeline

@@ -30,7 +30,7 @@ def register(path, num_count=1):
 # FIXME: read from configuration file
 register("contrib.user", num_count=3)
 register("contrib.worker_b")
-# register("contrib.note")
+register("contrib.note")
 # register("contrib.tag")
 # register("contrib.group")
 

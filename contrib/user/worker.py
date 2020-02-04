@@ -105,3 +105,14 @@ def user_profile(worker, task: Task):
 
     print("----------------->", user.notes)
     worker.action.set(token=task.token, data="lol")
+
+
+# --- DEBUG ---
+
+
+@register(__worker__, "user.debug")
+def user_profile(worker, task: Task):
+    from time import sleep
+
+    sleep(3)
+    worker.action.set(token=task.token, data="lol")

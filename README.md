@@ -1,4 +1,4 @@
-Spójrz na `contrib/user.py`:
+Look at `contrib/user.py`:
 
 ```
 http://0.0.0.0:8000/user/create
